@@ -91,24 +91,24 @@ const createAccount=async({name,accountAddress})=>{
   }
 }
 
-const addFriends=async({name,accountAddress})=>{
-  try{
-    if(!name||!accountAddress)
-    return setError("Name and account can't be emmpty ");
-    const contract=await connectingWithContract();
-    const addFriend=await contract.addFriend(accountAddress,name);
-    setLoading(true);
-    await addFriend.wait();
-    setLoading(false);
-    // navigate("/");
-    window.location.reload();
+// const addFriends=async({name,accountAddress})=>{
+//   try{
+//     if(!name||!accountAddress)
+//     return setError("Name and account can't be emmpty ");
+//     const contract=await connectingWithContract();
+//     const addFriend=await contract.addFriend(accountAddress,name);
+//     setLoading(true);
+//     await addFriend.wait();
+//     setLoading(false);
+//     // navigate("/");
+//     window.location.reload();
 
 
-  }catch(error)
-  {
-    setError("Error while adding friend");
-  }
-}
+//   }catch(error)
+//   {
+//     setError("Error while adding friend");
+//   }
+// }
 
 const sendMessage=async({msg,address})=>{
   try{

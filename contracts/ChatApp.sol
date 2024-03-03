@@ -33,7 +33,7 @@ contract ChatApp {
 
     function checkUserExist(address pubkey) public view returns(bool) {
 
-        console.log("userlist",pubkey,userList[pubkey].name);
+        // console.log("userlist",pubkey,userList[pubkey].name);
 
         return bytes(userList[pubkey].name).length > 0;
     }
@@ -60,19 +60,27 @@ contract ChatApp {
         return userList[pubkey].name;
     }
 
-    function addFriend(address friend_key, string calldata name) external {
+    function addFriend(address friend_key, string calldata name) external  returns(string memory){
+        console.log('list',friend_key,msg.sender,name);
         require(checkUserExist(msg.sender), "Create an account first");
         require(checkUserExist(friend_key), "User is not registered");
         require(msg.sender != friend_key, "User can't add themselves as a friend");
-        require(!checkAlreadyFriends(msg.sender, friend_key), "These users are already friends");
         
+        require(!checkAlreadyFriends(msg.sender, friend_key), "These users are already friends");
+
         _addFriend(msg.sender, friend_key, name);
+          console.log('work added');
         _addFriend(friend_key, msg.sender, userList[msg.sender].name);
+         console.log('friend added');
+        return "Friend Added";
     }
 
     function checkAlreadyFriends(address pubkey1, address pubkey2) internal view returns (bool) {
+        console.log('address',pubkey1,pubkey2);
         for (uint256 i = 0; i < userList[pubkey1].friendList.length; i++) {
+               console.log('ouer',userList[pubkey1].friendList[i].pubkey,pubkey2);
             if (userList[pubkey1].friendList[i].pubkey == pubkey2) {
+                console.log('in',userList[pubkey1].friendList[i].pubkey,pubkey2);
                 return true;
             }
         }
@@ -81,10 +89,14 @@ contract ChatApp {
 
     function _addFriend(address me, address friend_key, string memory name) internal {
         Friend memory newFriend = Friend(friend_key, name);
+        console.log('new',me,newFriend.pubkey,newFriend.name);
         userList[me].friendList.push(newFriend);
+        console.log('me');
     }
 
+
     function getMyFriendList() external view returns(Friend[] memory) {
+        console.log('friendlist');
         return userList[msg.sender].friendList;
     }
 
@@ -112,7 +124,7 @@ contract ChatApp {
     } 
 
     function getAllAppUser() public view returns(AllUserStruck[] memory){
-        console.log('alluser');
+
         return getAllUsers;
     }
 }
