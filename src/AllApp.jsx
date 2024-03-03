@@ -33,10 +33,10 @@ const fetchData=async()=>{
    console.log('not ',userName)
 
 
-   const friendList=await contract.getMyFriendList();
-   setFriendList(friendList);
-   const userList=await contract.getAllAppUser();
-   setUserList(userList);
+  //  const friendList=await contract.getMyFriendList();
+  //  setFriendList(friendList);
+  //  const userList=await contract.getAllAppUser();
+  //  setUserList(userList);
             
 
 

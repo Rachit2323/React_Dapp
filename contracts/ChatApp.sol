@@ -69,9 +69,9 @@ contract ChatApp {
         require(!checkAlreadyFriends(msg.sender, friend_key), "These users are already friends");
 
         _addFriend(msg.sender, friend_key, name);
-          console.log('work added');
+          console.log('work added',msg.sender, friend_key,name);
         _addFriend(friend_key, msg.sender, userList[msg.sender].name);
-         console.log('friend added');
+         console.log('friend added',friend_key, msg.sender,userList[msg.sender].name);
         return "Friend Added";
     }
 
@@ -96,7 +96,8 @@ contract ChatApp {
 
 
     function getMyFriendList() external view returns(Friend[] memory) {
-        console.log('friendlist');
+        console.log('friendlist',msg.sender);
+
         return userList[msg.sender].friendList;
     }
 
@@ -109,6 +110,7 @@ contract ChatApp {
     }
 
     function sendMessage(address friend_key, string calldata _msg) external {
+        console.log('msg',friend_key,_msg);
         require(checkUserExist(msg.sender), "Create an account first");
         require(checkUserExist(friend_key), "User is not registered");
         require(checkAlreadyFriends(msg.sender, friend_key), "You aren't friends with the given user");

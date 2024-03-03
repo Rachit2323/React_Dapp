@@ -10,6 +10,21 @@ const Dashboard = () => {
   const [allUserList, setAllUserList] = useState();
   const [searchValue, setSearchValue] = useState("");
   const [myFriendList, setMyFriendList] = useState();
+  const [selectedUserPubkey, setSelectedUserPubkey] = useState(null);
+  const [currentMessageUser, setCurrentMessageUser] = useState();
+  const [_msg, setMessage] = useState("");
+  const [allUserMessage, setAllUserMessage] = useState();
+
+  useEffect(() => {
+    if (account) {
+      const uppercaseToken = account.toLowerCase();
+      console.log(account);
+      localStorage.setItem("token", account);
+    }
+  }, [account]);
+
+  const presentUser = localStorage.getItem("token");
+
   const fetchData = async () => {
     try {
       const contract = await connectingWithContract();
@@ -40,52 +55,91 @@ const Dashboard = () => {
 
   const freindList = async () => {
     const contract = await connectingWithContract();
-
-    const allFriend = await contract.methods.getMyFriendList().call();
+    console.log(account);
+    const friend_key=account;
+    const allFriend = await contract.methods
+      .getMyFriendList()
+      .call({from:account});
+    
+    console.log(allFriend);
     setMyFriendList(allFriend);
   };
 
   const addFriends = async (name, friend_key) => {
     try {
-      console.log(name, friend_key);
+      console.log(name, friend_key, account);
       const contract = await connectingWithContract();
+      // account=account.toLowerCase();
 
       const addFriendList = await contract.methods
-        .addFriend(friend_key, name)
-        .send({ from: account });
+        .addFriend(friend_key.toLowerCase(), name)
+        .send({from:account});
       console.log("add", addFriendList);
       setLoading(true);
       await addFriendList.wait();
       setLoading(false);
 
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {}
   };
 
   const handleAddFriend = async (name, friendAddress) => {
+    console.log(name,friendAddress)
     const contract = await connectingWithContract();
     console.log(name, friendAddress);
     const Friend = await addFriends(name, friendAddress);
   };
 
-  const [selectedUserPubkey, setSelectedUserPubkey] = useState(null);
+  const sendMessageToBack = async (friend_key, _msg) => {
+    const contract = await connectingWithContract();
+    const messageSend = await contract.methods
+      .sendMessage(friend_key, _msg)
+      .send({ from: account });
+    const receivemsg = await contract.methods.readMessage(friend_key).call();
+    console.log("re", receivemsg);
+    setAllUserMessage(receivemsg);
+    setMessage("");
+  };
 
-  const messageUser = async (pubkey) => {
+  const messageUser = async (pubkey, name) => {
     setSelectedUserPubkey(pubkey);
+    setCurrentMessageUser(name);
   };
 
   useEffect(() => {
     fetchData();
     allUser();
-    freindList();
   }, []);
 
-  console.log("list", allUserList, myFriendList);
+  useEffect(() => {
+    if (account) {
+      console.log('accotn',account)
+      freindList(account);
+    }
+  }, [account]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+
+        const contract = await connectingWithContract();
+        const receivemsg = await contract.methods
+          .readMessage(selectedUserPubkey)
+          .call();
+
+        setAllUserMessage(receivemsg);
+      } catch (error) {}
+    };
+
+    fetchData();
+  }, [selectedUserPubkey]);
+
+  // console.log("list", allUserList, myFriendList, presentUser);
   return (
     <nav className="bg-gray-800 p-4 flex h-screen w-screen flex-col items-center justify-between">
       <div className="flex w-full justify-between">
         <div className="text-white text-xl font-bold">ChatApp</div>
-        <div className="text-white">{userName}</div>
+        <div className="text-white">{userName}:{account}</div>
       </div>
 
       <hr className="h-0.5 w-screen block border-t border-gray-300" />
@@ -110,21 +164,24 @@ const Dashboard = () => {
                   key={user.accountAddress}
                   className="text-white border-b flex justify-between border-gray-700 py-2 align-middle"
                 >
-                  <div className="flex flex-col">
-                    <div>UserName : {user.name}</div>
-                    {/* <div className="sm:flex sm:flex-col">
-                  Address :{" "}
-                  <span className="font text-sm">{user.accountAddress}</span>
-                </div> */}
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleAddFriend(user.name, user.accountAddress)
-                    }
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded border border-blue-700 cursor-pointer"
-                  >
-                    Add Friend
-                  </button>
+                  {user.accountAddress.toLowerCase() !==
+                    account.toLowerCase() && (
+                    <div className="flex flex-col">
+                      <div>UserName: {user.name}</div>
+                      {/* <div className="sm:flex sm:flex-col">
+      Address:{" "}
+      <span className="font text-sm">{user.accountAddress}</span>
+    </div> */}
+                      <button
+                        onClick={() =>
+                          handleAddFriend(user.name, user.accountAddress)
+                        }
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded border border-blue-700 cursor-pointer"
+                      >
+                        Add Friend
+                      </button>
+                    </div>
+                  )}
                 </li>
               ))}
           </ul>
@@ -145,7 +202,7 @@ const Dashboard = () => {
                           ? "bg-blue-500 text-white border border-blue-500"
                           : ""
                       }`}
-                      onClick={() => messageUser(user.pubkey)}
+                      onClick={() => messageUser(user.pubkey, user.name)}
                     >
                       {user.name}
                     </div>
@@ -155,19 +212,42 @@ const Dashboard = () => {
             </div>
             <span className="block h-full bg-white w-0.5 m-2"></span>
 
-            <div className="flex mt-4 w-[85%] flex-col">
-              <div className="flex w-[100%] h-full"></div>
-              <div className="flex w-[100%]">
-                <input
-                  type="text"
-                  placeholder="Type your message..."
-                  className="flex-grow border outline-none border-gray-300 rounded-l px-4 py-2"
-                />
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r border border-blue-700 cursor-pointer">
-                  Send
-                </button>
+            {selectedUserPubkey && (
+              <div className="flex mt-4 w-[85%] flex-col">
+                <div className="flex w-full h-full border flex-col rounded border-gray-300">
+                  <span className="w-full justify-center flex bg-yellow-100 text-cyan-800  align-middle">
+                    User: {currentMessageUser}
+                  </span>
+                  <div className="w-full ">
+                    {allUserMessage?.map((message, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-300 rounded p-2 mb-2"
+                      >
+                        <p>Message: {message.msg}</p>
+                        {/* <p>Sender: {message.sender}</p> */}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex w-[100%]">
+                  <input
+                    type="text"
+                    placeholder="Type your message..."
+                    value={_msg}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="flex-grow border outline-none border-gray-300 rounded-l px-4 py-2"
+                  />
+                  <button
+                    onClick={() => sendMessageToBack(selectedUserPubkey, _msg)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r border border-blue-700 cursor-pointer"
+                  >
+                    Send
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
