@@ -3,6 +3,7 @@ import {
   connectWallet,
   connectingWithContract,
 } from "../../Utils/apiFeature.js";
+import ScrollToBottom from "react-scroll-to-bottom";
 
 const Dashboard = () => {
   const [account, setAccount] = useState("");
@@ -14,6 +15,8 @@ const Dashboard = () => {
   const [currentMessageUser, setCurrentMessageUser] = useState();
   const [_msg, setMessage] = useState("");
   const [allUserMessage, setAllUserMessage] = useState();
+  const [sendingBack, setSendingBack] = useState(false);
+  const [newmsg, setNewMsg] = useState([]);
 
   useEffect(() => {
     if (account) {
@@ -56,11 +59,11 @@ const Dashboard = () => {
   const freindList = async () => {
     const contract = await connectingWithContract();
     console.log(account);
-    const friend_key=account;
+    const friend_key = account;
     const allFriend = await contract.methods
       .getMyFriendList()
-      .call({from:account});
-    
+      .call({ from: account });
+
     console.log(allFriend);
     setMyFriendList(allFriend);
   };
@@ -73,7 +76,7 @@ const Dashboard = () => {
 
       const addFriendList = await contract.methods
         .addFriend(friend_key.toLowerCase(), name)
-        .send({from:account});
+        .send({ from: account });
       console.log("add", addFriendList);
       setLoading(true);
       await addFriendList.wait();
@@ -84,21 +87,35 @@ const Dashboard = () => {
   };
 
   const handleAddFriend = async (name, friendAddress) => {
-    console.log(name,friendAddress)
+    console.log(name, friendAddress);
     const contract = await connectingWithContract();
     console.log(name, friendAddress);
     const Friend = await addFriends(name, friendAddress);
   };
 
   const sendMessageToBack = async (friend_key, _msg) => {
+    setSendingBack(true);
     const contract = await connectingWithContract();
     const messageSend = await contract.methods
       .sendMessage(friend_key, _msg)
       .send({ from: account });
     const receivemsg = await contract.methods.readMessage(friend_key).call();
-    console.log("re", receivemsg);
-    setAllUserMessage(receivemsg);
+ 
+    // const newmsg = [{
+    //   sender: account, 
+    //   msg: _msg, 
+    //   timestamp: BigInt(Date.now()), 
+    // }];
+    setNewMsg({
+      sender: account,
+      msg: _msg,
+      timestamp: BigInt(Date.now()),
+    })
+    console.log('new',newmsg)
+    // setAllUserMessage((prevMessages) => [...prevMessages, ...newmsg]);
+      console.log(allUserMessage);
     setMessage("");
+    setSendingBack(false);
   };
 
   const messageUser = async (pubkey, name) => {
@@ -113,7 +130,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (account) {
-      console.log('accotn',account)
       freindList(account);
     }
   }, [account]);
@@ -122,24 +138,39 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
 
-        const contract = await connectingWithContract();
-        const receivemsg = await contract.methods
-          .readMessage(selectedUserPubkey)
-          .call();
+        if(newmsg)
+        {
+          console.log(newmsg)
+          // setAllUserMessage((prevMessages) => [...prevMessages, newmsg]);
 
-        setAllUserMessage(receivemsg);
-      } catch (error) {}
+        }
+        if (sendingBack || selectedUserPubkey) {
+          const contract = await connectingWithContract();
+          const receivemsg = await contract.methods
+            .readMessage(selectedUserPubkey)
+            .call({ from: account });
+            console.log(receivemsg)
+
+          setAllUserMessage(receivemsg);
+        }
+      } catch (error) {
+        // Handle error if needed
+      }
     };
 
+    
+
     fetchData();
-  }, [selectedUserPubkey]);
+  }, [selectedUserPubkey, sendingBack,newmsg]);
 
   // console.log("list", allUserList, myFriendList, presentUser);
   return (
-    <nav className="bg-gray-800 p-4 flex h-screen w-screen flex-col items-center justify-between">
+    <nav className="bg-gray-800 p-4 flex h-screen w-screen flex-col items-center justify-between fixed">
       <div className="flex w-full justify-between">
         <div className="text-white text-xl font-bold">ChatApp</div>
-        <div className="text-white">{userName}:{account}</div>
+        <div className="text-white">
+          {userName}:{account}
+        </div>
       </div>
 
       <hr className="h-0.5 w-screen block border-t border-gray-300" />
@@ -189,7 +220,7 @@ const Dashboard = () => {
 
         <div className="flex w-[74%]">
           <div className="flex border border-gray-300 rounded p-4 w-full">
-            <div className="overflow-y-auto flex-grow flex-col flex w-[15%]">
+            <div className="overflow-y-auto flex-grow flex-col flex w-[15%] ">
               {myFriendList?.map((user) => (
                 <li
                   key={user.pubkey}
@@ -218,17 +249,40 @@ const Dashboard = () => {
                   <span className="w-full justify-center flex bg-yellow-100 text-cyan-800  align-middle">
                     User: {currentMessageUser}
                   </span>
-                  <div className="w-full ">
+                  <ScrollToBottom className="w-full h-full pt-3 overflow-y-auto max-h-[610px]">
                     {allUserMessage?.map((message, index) => (
                       <div
                         key={index}
-                        className="border border-gray-300 rounded p-2 mb-2"
+                        className="w-full "
+                        style={{
+                          marginLeft:
+                            message.sender.toLowerCase() ===
+                            account.toLowerCase()
+                              ? "65%"
+                              : "2%",
+                        }}
                       >
-                        <p>Message: {message.msg}</p>
-                        {/* <p>Sender: {message.sender}</p> */}
+                        {/* marginLeft: message.sender === account ? '200px' : '0' */}
+                        <div
+                          className="border border-gray-300 w-1/3  rounded p-2 mb-2"
+                          style={{
+                            background:
+                              message.sender.toLowerCase() ===
+                              account.toLowerCase()
+                                ? "green"
+                                : "blue",
+                          }}
+                        >
+                          {/* {console.log(message.sender,account,typeof(account),typeof(message.sender))} */}
+                          <p style={{ color: "white" }}>
+                            Message: {message.msg}
+                          </p>
+
+                          {/* <p>Sender: {message.sender}</p> */}
+                        </div>
                       </div>
                     ))}
-                  </div>
+                  </ScrollToBottom>
                 </div>
 
                 <div className="flex w-[100%]">

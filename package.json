@@ -17,6 +17,7 @@
     "react-dom": "^18.2.0",
     "react-redux": "^9.1.0",
     "react-router-dom": "^6.22.2",
+    "react-scroll-to-bottom": "^4.2.0",
     "redux": "^5.0.1",
     "web3": "^4.5.0",
     "web3modal": "^1.9.12"
