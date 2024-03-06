@@ -4,6 +4,8 @@ import "hardhat/console.sol";
 
 contract ChatApp {
     // Define an event
+    event UserCreated(string name);
+
 
     struct Friend {
         address pubkey;
@@ -38,9 +40,14 @@ contract ChatApp {
         return bytes(userList[pubkey].name).length > 0;
     }
 
+function working() external pure returns (string memory) {
+    return "working";
+}
+
     function createAccount(string calldata name,address accountAddress) external returns(string memory){
      
         console.log(name,"MS",accountAddress);
+        
 
         require(!checkUserExist(accountAddress), "User already exists");
         require(bytes(name).length > 0, "User name can't be empty");
@@ -48,9 +55,9 @@ contract ChatApp {
         userList[accountAddress].name = name;
 
         getAllUsers.push(AllUserStruck(name,accountAddress));
+        emit UserCreated(name);
         console.log("User added:", userList[accountAddress].name);
-          
-    
+        
         return "User Created";
     }
 

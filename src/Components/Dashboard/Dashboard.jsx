@@ -16,7 +16,7 @@ const Dashboard = () => {
   const [_msg, setMessage] = useState("");
   const [allUserMessage, setAllUserMessage] = useState();
   const [sendingBack, setSendingBack] = useState(false);
-  const [newmsg, setNewMsg] = useState([]);
+  const [newmsg, setNewMsg] = useState();
 
   useEffect(() => {
     if (account) {
@@ -35,9 +35,8 @@ const Dashboard = () => {
       const connectAccount = await connectWallet();
       setAccount(connectAccount);
 
-      const userName = await contract.methods
-        .getUsername(connectAccount)
-        .call();
+      const userName = await contract
+        .getUsername(connectAccount);
       setUserName(userName);
     } catch (error) {
       // setError("Please install the Metamask");
@@ -50,7 +49,8 @@ const Dashboard = () => {
 
       const connectAccount = await connectWallet();
       setAccount(connectAccount);
-      const allUser = await contract.methods.getAllAppUser().call();
+      // const allUser = await contract.methods.getAllAppUser().call();
+      const allUser = await contract.getAllAppUser().call();
 
       setAllUserList(allUser);
     } catch (error) {}
@@ -60,9 +60,8 @@ const Dashboard = () => {
     const contract = await connectingWithContract();
     console.log(account);
     const friend_key = account;
-    const allFriend = await contract.methods
-      .getMyFriendList()
-      .call({ from: account });
+    const allFriend = await contract
+      .getMyFriendList();
 
     console.log(allFriend);
     setMyFriendList(allFriend);
@@ -134,22 +133,19 @@ const Dashboard = () => {
     }
   }, [account]);
 
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
 
-        if(newmsg)
-        {
-          console.log(newmsg)
-          // setAllUserMessage((prevMessages) => [...prevMessages, newmsg]);
-
-        }
+       
         if (sendingBack || selectedUserPubkey) {
           const contract = await connectingWithContract();
           const receivemsg = await contract.methods
             .readMessage(selectedUserPubkey)
             .call({ from: account });
-            console.log(receivemsg)
+            // console.log(receivemsg)
 
           setAllUserMessage(receivemsg);
         }
@@ -241,8 +237,8 @@ const Dashboard = () => {
                 </li>
               ))}
             </div>
-            <span className="block h-full bg-white w-0.5 m-2"></span>
-
+            {selectedUserPubkey&&(<span className="block h-full bg-white w-0.5 m-2"></span>
+)}
             {selectedUserPubkey && (
               <div className="flex mt-4 w-[85%] flex-col">
                 <div className="flex w-full h-full border flex-col rounded border-gray-300">

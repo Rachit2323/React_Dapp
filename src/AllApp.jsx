@@ -27,17 +27,12 @@ const fetchData=async()=>{
 
    console.log('notdd ',connectAccount)
 
-   const userName=await contract.methods.getUsername(connectAccount).call();
+   const userName=await contract.getUsername(connectAccount);
    setUserName(userName);
 
    console.log('not ',userName)
 
 
-  //  const friendList=await contract.getMyFriendList();
-  //  setFriendList(friendList);
-  //  const userList=await contract.getAllAppUser();
-  //  setUserList(userList);
-            
 
 
   }catch(error)
@@ -72,8 +67,7 @@ const createAccount=async({name,accountAddress})=>{
     
      const contract=await connectingWithContract();
 
-
-     const getCreateUser=await contract.methods.createAccount(name,accountAddress).send({from:accountAddress});
+     const getCreateUser=await contract.createAccount(name,accountAddress).send({from:accountAddress});
      console.log('work',name,getCreateUser);
     //  fetchData();
                    
