@@ -3,7 +3,7 @@ import {
   loadFixture,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers.js";
 // import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs.js";
-import { expect } from "chai";
+// import { expect } from "chai";
 
 describe("Lock", function () {
   // We define a fixture to reuse the same setup in every test.
