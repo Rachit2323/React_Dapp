@@ -21,7 +21,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (account) {
       const uppercaseToken = account.toLowerCase();
-      console.log(account);
+
       localStorage.setItem("token", account);
     }
   }, [account]);
@@ -35,8 +35,7 @@ const Dashboard = () => {
       const connectAccount = await connectWallet();
       setAccount(connectAccount);
 
-      const userName = await contract
-        .getUsername(connectAccount);
+      const userName = await contract.getUsername(connectAccount);
       setUserName(userName);
     } catch (error) {
       // setError("Please install the Metamask");
@@ -50,7 +49,7 @@ const Dashboard = () => {
       const connectAccount = await connectWallet();
       setAccount(connectAccount);
       // const allUser = await contract.methods.getAllAppUser().call();
-      const allUser = await contract.getAllAppUser().call();
+      const allUser = await contract.getAllAppUser();
 
       setAllUserList(allUser);
     } catch (error) {}
@@ -60,8 +59,7 @@ const Dashboard = () => {
     const contract = await connectingWithContract();
     console.log(account);
     const friend_key = account;
-    const allFriend = await contract
-      .getMyFriendList();
+    const allFriend = await contract.getMyFriendList();
 
     console.log(allFriend);
     setMyFriendList(allFriend);
@@ -73,7 +71,7 @@ const Dashboard = () => {
       const contract = await connectingWithContract();
       // account=account.toLowerCase();
 
-      const addFriendList = await contract.methods
+      const addFriendList = await contract
         .addFriend(friend_key.toLowerCase(), name)
         .send({ from: account });
       console.log("add", addFriendList);
@@ -95,24 +93,22 @@ const Dashboard = () => {
   const sendMessageToBack = async (friend_key, _msg) => {
     setSendingBack(true);
     const contract = await connectingWithContract();
-    const messageSend = await contract.methods
-      .sendMessage(friend_key, _msg)
-      .send({ from: account });
-    const receivemsg = await contract.methods.readMessage(friend_key).call();
- 
+    await contract.sendMessage(friend_key, _msg);
+    const receivemsg = await contract.readMessage(friend_key);
+
     // const newmsg = [{
-    //   sender: account, 
-    //   msg: _msg, 
-    //   timestamp: BigInt(Date.now()), 
+    //   sender: account,
+    //   msg: _msg,
+    //   timestamp: BigInt(Date.now()),
     // }];
     setNewMsg({
       sender: account,
       msg: _msg,
       timestamp: BigInt(Date.now()),
-    })
-    console.log('new',newmsg)
+    });
+    // console.log("new", newmsg);
     // setAllUserMessage((prevMessages) => [...prevMessages, ...newmsg]);
-      console.log(allUserMessage);
+    console.log(allUserMessage);
     setMessage("");
     setSendingBack(false);
   };
@@ -133,19 +129,13 @@ const Dashboard = () => {
     }
   }, [account]);
 
-
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-
-       
         if (sendingBack || selectedUserPubkey) {
           const contract = await connectingWithContract();
-          const receivemsg = await contract.methods
-            .readMessage(selectedUserPubkey)
-            .call({ from: account });
-            // console.log(receivemsg)
+          const receivemsg = await contract.readMessage(selectedUserPubkey);
+          // console.log(receivemsg)
 
           setAllUserMessage(receivemsg);
         }
@@ -154,10 +144,8 @@ const Dashboard = () => {
       }
     };
 
-    
-
     fetchData();
-  }, [selectedUserPubkey, sendingBack,newmsg]);
+  }, [selectedUserPubkey, sendingBack, newmsg]);
 
   // console.log("list", allUserList, myFriendList, presentUser);
   return (
@@ -205,7 +193,11 @@ const Dashboard = () => {
                         }
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded border border-blue-700 cursor-pointer"
                       >
-                        Add Friend
+                        {myFriendList?.some(
+                          (friend) => friend.pubkey === user.accountAddress
+                        )
+                          ? "Friend"
+                          : "Add Friend"}
                       </button>
                     </div>
                   )}
@@ -237,8 +229,9 @@ const Dashboard = () => {
                 </li>
               ))}
             </div>
-            {selectedUserPubkey&&(<span className="block h-full bg-white w-0.5 m-2"></span>
-)}
+            {selectedUserPubkey && (
+              <span className="block h-full bg-white w-0.5 m-2"></span>
+            )}
             {selectedUserPubkey && (
               <div className="flex mt-4 w-[85%] flex-col">
                 <div className="flex w-full h-full border flex-col rounded border-gray-300">

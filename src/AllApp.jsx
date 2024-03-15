@@ -104,21 +104,21 @@ const createAccount=async({name,accountAddress})=>{
 //   }
 // }
 
-const sendMessage=async({msg,address})=>{
-  try{
-    if(!msg||!address)
-    return setError("Please type your message");
-    const contract=await connectingWithContract();
-    const addMessage=await contract.sendMessage(address,msg);
-    setLoading(true);
-    await addMessage.wait();
-    setLoading(false);
-    window.location.reload();
-  }catch(error)
-  {
-    setError("please reload the window")
-  }
-}
+// const sendMessage=async({msg,address})=>{
+//   try{
+//     if(!msg||!address)
+//     return setError("Please type your message");
+//     const contract=await connectingWithContract();
+//     const addMessage=await contract.sendMessage(address,msg);
+//     setLoading(true);
+//     await addMessage.wait();
+//     setLoading(false);
+//     window.location.reload();
+//   }catch(error)
+//   {
+//     setError("please reload the window")
+//   }
+// }
 
 const readUser=async(userAddress)=>{
   const contract=await connectingWithContract();
