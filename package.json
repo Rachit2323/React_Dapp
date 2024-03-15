@@ -22,7 +22,7 @@
     "redux": "^5.0.1",
     "web3": "^4.5.0",
     "web3modal": "^1.9.12",
-    "chai": "^5.1.0"
+    "chai": "^4.2.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
