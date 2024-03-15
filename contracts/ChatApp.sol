@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT 
 pragma solidity >=0.7.0 <0.9.0;
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 contract ChatApp {
     // Define an event
@@ -46,7 +46,7 @@ function working() external pure returns (string memory) {
 
     function createAccount(string calldata name,address accountAddress) external returns(string memory){
      
-        console.log(name,"MS",accountAddress);
+        // console.log(name,"MS",accountAddress);
         
 
         require(!checkUserExist(accountAddress), "User already exists");
@@ -56,19 +56,19 @@ function working() external pure returns (string memory) {
 
         getAllUsers.push(AllUserStruck(name,accountAddress));
         emit UserCreated(name);
-        console.log("User added:", userList[accountAddress].name);
+        // console.log("User added:", userList[accountAddress].name);
         
         return "User Created";
     }
 
     function getUsername(address pubkey) external view returns(string memory) {
-        console.log('user',pubkey);
+        // console.log('user',pubkey);
         require(checkUserExist(pubkey), "User does not exist");
         return userList[pubkey].name;
     }
 
     function addFriend(address friend_key, string calldata name) external  returns(string memory){
-        console.log('list',friend_key,msg.sender,name);
+        // console.log('list',friend_key,msg.sender,name);
         require(checkUserExist(msg.sender), "Create an account first");
         require(checkUserExist(friend_key), "User is not registered");
         require(msg.sender != friend_key, "User can't add themselves as a friend");
@@ -76,18 +76,18 @@ function working() external pure returns (string memory) {
         require(!checkAlreadyFriends(msg.sender, friend_key), "These users are already friends");
 
         _addFriend(msg.sender, friend_key, name);
-          console.log('work added',msg.sender, friend_key,name);
+        //   console.log('work added',msg.sender, friend_key,name);
         _addFriend(friend_key, msg.sender, userList[msg.sender].name);
-         console.log('friend added',friend_key, msg.sender,userList[msg.sender].name);
+        //  console.log('friend added',friend_key, msg.sender,userList[msg.sender].name);
         return "Friend Added";
     }
 
     function checkAlreadyFriends(address pubkey1, address pubkey2) internal view returns (bool) {
-        console.log('address',pubkey1,pubkey2);
+        // console.log('address',pubkey1,pubkey2);
         for (uint256 i = 0; i < userList[pubkey1].friendList.length; i++) {
-               console.log('ouer',userList[pubkey1].friendList[i].pubkey,pubkey2);
+            //    console.log('ouer',userList[pubkey1].friendList[i].pubkey,pubkey2);
             if (userList[pubkey1].friendList[i].pubkey == pubkey2) {
-                console.log('in',userList[pubkey1].friendList[i].pubkey,pubkey2);
+                // console.log('in',userList[pubkey1].friendList[i].pubkey,pubkey2);
                 return true;
             }
         }
@@ -96,14 +96,14 @@ function working() external pure returns (string memory) {
 
     function _addFriend(address me, address friend_key, string memory name) internal {
         Friend memory newFriend = Friend(friend_key, name);
-        console.log('new',me,newFriend.pubkey,newFriend.name);
+        // console.log('new',me,newFriend.pubkey,newFriend.name);
         userList[me].friendList.push(newFriend);
-        console.log('me');
+        // console.log('me');
     }
 
 
     function getMyFriendList() external view returns(Friend[] memory) {
-        console.log('friendlist',msg.sender);
+        // console.log('friendlist',msg.sender);
 
         return userList[msg.sender].friendList;
     }
@@ -117,7 +117,7 @@ function working() external pure returns (string memory) {
     }
 
     function sendMessage(address friend_key, string calldata _msg) external {
-        console.log('msg',friend_key,_msg);
+        // console.log('msg',friend_key,_msg);
         require(checkUserExist(msg.sender), "Create an account first");
         require(checkUserExist(friend_key), "User is not registered");
         require(checkAlreadyFriends(msg.sender, friend_key), "You aren't friends with the given user");
