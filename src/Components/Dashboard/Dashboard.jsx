@@ -179,7 +179,7 @@ const Dashboard = () => {
     fetchData();
   }, [selectedUserPubkey, sendingBack, newmsg]);
 
-  // console.log("list", allUserList, myFriendList, presentUser);
+
   return (
     <nav className="bg-gray-800 p-4 flex h-screen w-screen flex-col items-center justify-between fixed ">
       <div className="flex w-full justify-between">

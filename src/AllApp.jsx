@@ -25,13 +25,18 @@ function AllApp() {
 
       const connectAccount = await connectWallet();
       setAccount(connectAccount);
+      
 
       if (!connectAccount) {
         toast.error("Connect your Meta Mask ");
       }
 
+
+    
       const userName = await contract.getUsername(connectAccount);
       setUserName(userName);
+       
+      
     } catch (error) {
       setError("Please install the Metamask");
     }

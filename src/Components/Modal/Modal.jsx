@@ -17,6 +17,7 @@ const Modal = ({ account ,userName,createAccount }) => {
         ...prevFormData,
         address: account
       }));
+     
     }
   }, [account]);
   
@@ -33,7 +34,7 @@ const Modal = ({ account ,userName,createAccount }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     createAccount({ name: formData.username, accountAddress: formData.address });
-
+    window.location.reload();
   };
 
   useEffect(()=>{
