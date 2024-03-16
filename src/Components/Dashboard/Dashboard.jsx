@@ -6,7 +6,7 @@ import {
 import ScrollToBottom from "react-scroll-to-bottom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Loader from "../../assets/Loader.svg";
 
 const Dashboard = () => {
   const [account, setAccount] = useState("");
@@ -20,6 +20,7 @@ const Dashboard = () => {
   const [allUserMessage, setAllUserMessage] = useState();
   const [sendingBack, setSendingBack] = useState(false);
   const [newmsg, setNewMsg] = useState();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (account) {
@@ -85,7 +86,6 @@ const Dashboard = () => {
     } catch (error) {
       toast.error("Already Friend");
 
-     
       // Check if addFriend function exists in the contract instance
     }
   };
@@ -115,9 +115,9 @@ const Dashboard = () => {
     //   timestamp: BigInt(Date.now()),
     // });
     // console.log("new", newmsg);
-    // setLoading(true);
+    setLoading(true);
     await newmsgback.wait();
-    // setLoading(false);
+    setLoading(false);
     // setAllUserMessage((prevMessages) => [...prevMessages, ...newmsg]);
     // console.log(allUserMessage);
     setMessage("");
@@ -128,7 +128,7 @@ const Dashboard = () => {
         msg: _msg,
         timestamp: BigInt(Date.now()),
       };
-      setAllUserMessage((prevMessages) => [...prevMessages, newMsg]); 
+      setAllUserMessage((prevMessages) => [...prevMessages, newMsg]);
       return newMsg; // Return newMsg to setNewMsg
     });
 
@@ -137,9 +137,12 @@ const Dashboard = () => {
   };
 
   const messageUser = async (pubkey, name) => {
-    // console.log('ddd')
+
+    setLoading(true);
     setSelectedUserPubkey(pubkey);
     setCurrentMessageUser(name);
+    setLoading(false);
+
   };
 
   useEffect(() => {
@@ -157,11 +160,16 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         if (sendingBack || selectedUserPubkey) {
+          setLoading(true);
           const contract = await connectingWithContract();
           const receivemsg = await contract.readMessage(selectedUserPubkey);
-          // console.log(receivemsg)
-
+          // await receivemsg.wait();
+         
+          
           setAllUserMessage(receivemsg);
+        
+          setLoading(false);
+
         }
       } catch (error) {
         // Handle error if needed
@@ -173,7 +181,7 @@ const Dashboard = () => {
 
   // console.log("list", allUserList, myFriendList, presentUser);
   return (
-    <nav className="bg-gray-800 p-4 flex h-screen w-screen flex-col items-center justify-between fixed">
+    <nav className="bg-gray-800 p-4 flex h-screen w-screen flex-col items-center justify-between fixed ">
       <div className="flex w-full justify-between">
         <div className="text-white text-xl font-bold">ChatApp</div>
         <div className="text-white">
@@ -318,6 +326,10 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+    {loading&&(<div className="flex justify-center items-center w-screen h-screen absolute">
+      <img className="w-[100px] h-[100px]" src={Loader} />
+    </div>)}
+
       <ToastContainer />
     </nav>
   );
