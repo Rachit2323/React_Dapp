@@ -76,18 +76,19 @@ const Dashboard = () => {
     try {
       // console.log(name, friend_key, account);
       const contract = await connectingWithContract();
-
+      console.log("check");
       const addFriendList = await contract
         .addFriend(friend_key.toLowerCase(), name)
         .send({ from: account });
-      // console.log("add", addFriendList);
+      console.log("add");
       setLoading(true);
       await addFriendList.wait();
       setLoading(false);
-      toast.success("Added as Friend");
+      // toast.success("Added as Friend");
+      console.log('done');
       window.location.reload();
     } catch (error) {
-      toast.error("Already Friend");
+      // toast.error("Already Friend");
 
       // Check if addFriend function exists in the contract instance
     }

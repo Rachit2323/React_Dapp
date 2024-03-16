@@ -68,6 +68,7 @@ function AllApp() {
         .send({ from: accountAddress });
 
       //  fetchData();
+      console.log(getCreateUser)
 
       setLoading(true);
       await getCreateUser.wait();
@@ -75,6 +76,7 @@ function AllApp() {
 
       window.location.reload();
     } catch (error) {
+      console.log(error)
       setError("Please reload your browser");
     }
   };
