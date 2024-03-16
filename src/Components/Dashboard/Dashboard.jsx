@@ -57,43 +57,44 @@ const Dashboard = () => {
 
   const freindList = async () => {
     const contract = await connectingWithContract();
-    console.log(account);
+    // console.log(account);
     const friend_key = account;
     const allFriend = await contract.getMyFriendList();
 
-    console.log(allFriend);
+    // console.log(allFriend);
     setMyFriendList(allFriend);
   };
 
   const addFriends = async (name, friend_key) => {
     try {
-      console.log(name, friend_key, account);
+      // console.log(name, friend_key, account);
       const contract = await connectingWithContract();
-      // account=account.toLowerCase();
 
       const addFriendList = await contract
         .addFriend(friend_key.toLowerCase(), name)
         .send({ from: account });
-      console.log("add", addFriendList);
+      // console.log("add", addFriendList);
       setLoading(true);
       await addFriendList.wait();
       setLoading(false);
-
-      // window.location.reload();
-    } catch (error) {}
+      window.location.reload();
+    } catch (error) {
+      // console.log("err", error);
+      // Check if addFriend function exists in the contract instance
+    }
   };
 
   const handleAddFriend = async (name, friendAddress) => {
-    console.log(name, friendAddress);
+    // console.log(name, friendAddress);
     const contract = await connectingWithContract();
-    console.log(name, friendAddress);
+    // console.log(name, friendAddress);
     const Friend = await addFriends(name, friendAddress);
   };
 
   const sendMessageToBack = async (friend_key, _msg) => {
     setSendingBack(true);
     const contract = await connectingWithContract();
-    await contract.sendMessage(friend_key, _msg);
+    const newmsgback = await contract.sendMessage(friend_key, _msg);
     const receivemsg = await contract.readMessage(friend_key);
 
     // const newmsg = [{
@@ -101,19 +102,36 @@ const Dashboard = () => {
     //   msg: _msg,
     //   timestamp: BigInt(Date.now()),
     // }];
-    setNewMsg({
-      sender: account,
-      msg: _msg,
-      timestamp: BigInt(Date.now()),
-    });
+    // console.log(account, _msg);
+    // setNewMsg({
+    //   sender: account,
+    //   msg: _msg,
+    //   timestamp: BigInt(Date.now()),
+    // });
     // console.log("new", newmsg);
+    // setLoading(true);
+    await newmsgback.wait();
+    // setLoading(false);
     // setAllUserMessage((prevMessages) => [...prevMessages, ...newmsg]);
-    console.log(allUserMessage);
+    // console.log(allUserMessage);
     setMessage("");
+    // console.log(newmsg);
+    setNewMsg((_prevMsg) => {
+      const newMsg = {
+        sender: account,
+        msg: _msg,
+        timestamp: BigInt(Date.now()),
+      };
+      setAllUserMessage((prevMessages) => [...prevMessages, newMsg]); 
+      return newMsg; // Return newMsg to setNewMsg
+    });
+
+    // window.location.reload();
     setSendingBack(false);
   };
 
   const messageUser = async (pubkey, name) => {
+    // console.log('ddd')
     setSelectedUserPubkey(pubkey);
     setCurrentMessageUser(name);
   };
@@ -125,7 +143,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (account) {
-      freindList(account);
+      freindList();
     }
   }, [account]);
 

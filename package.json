@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@alch/alchemy-web3": "^1.4.7",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
     "@reduxjs/toolkit": "^2.2.1",
     "ethers": "^5.7.2",
     "events": "^3.3.0",
@@ -19,12 +22,10 @@
     "react-redux": "^9.1.0",
     "react-router-dom": "^6.22.2",
     "react-scroll-to-bottom": "^4.2.0",
+    "react-toastify": "^10.0.5",
     "redux": "^5.0.1",
     "web3": "^4.5.0",
-    "web3modal": "^1.9.12",
-    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
-    "@nomiclabs/hardhat-ethers": "^2.2.3",
-    "@nomiclabs/hardhat-waffle": "^2.0.6"
+    "web3modal": "^1.9.12"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",

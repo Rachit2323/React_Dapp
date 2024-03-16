@@ -8,7 +8,7 @@ const Modal = ({ account ,userName,createAccount }) => {
 
   const [formData, setFormData] = useState({
     username: "",
-    address: account, 
+    address: account||"", 
   });
 
   useEffect(() => {
@@ -36,10 +36,13 @@ const Modal = ({ account ,userName,createAccount }) => {
 
   };
 
-  if(userName)
-  {
-    navigate("/dash");
-  }
+  useEffect(()=>{
+    if(userName)
+    {
+      navigate("/dash");
+    }
+  
+  },[userName])
 
 
   return (
@@ -60,7 +63,7 @@ const Modal = ({ account ,userName,createAccount }) => {
               type="text"
               id="username"
               name="username"
-              value={formData.username} // Bind value to form state
+              value={formData?.username} // Bind value to form state
               onChange={handleInputChange} // Handle input change
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
@@ -76,7 +79,7 @@ const Modal = ({ account ,userName,createAccount }) => {
               type="text"
               id="address"
               name="address"
-              value={account} 
+              value={account||""} 
               onChange={handleInputChange} 
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
