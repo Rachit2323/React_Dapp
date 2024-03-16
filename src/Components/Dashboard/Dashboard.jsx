@@ -4,6 +4,9 @@ import {
   connectingWithContract,
 } from "../../Utils/apiFeature.js";
 import ScrollToBottom from "react-scroll-to-bottom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const Dashboard = () => {
   const [account, setAccount] = useState("");
@@ -77,9 +80,12 @@ const Dashboard = () => {
       setLoading(true);
       await addFriendList.wait();
       setLoading(false);
+      toast.success("Added as Friend");
       window.location.reload();
     } catch (error) {
-      // console.log("err", error);
+      toast.error("Already Friend");
+
+     
       // Check if addFriend function exists in the contract instance
     }
   };
@@ -312,6 +318,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </nav>
   );
 };
